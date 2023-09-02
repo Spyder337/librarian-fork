@@ -54,9 +54,9 @@ Press 'q' or 'esc' to quit the program and close the webcam feed window.
 
 The program contains a few configuration options:
 
-The program assumes a USB webcam is used, oriented facing your desk for easy barcode scanning.
-You can change the location of the SQLite database file by modifying the database connection paths in the code.
-Captured barcode frames are saved in a 'captures' directory. You can change this directory's name or location by modifying the save_capture function.
+- The program assumes a USB webcam is used, oriented facing your desk for easy barcode scanning.
+- You can change the location of the SQLite database file by modifying the database connection paths in the code.
+- Captured barcode frames are saved in a 'captures' directory. You can change this directory's name or location by modifying the save_capture function.
 
 ## Additional Notes
 
