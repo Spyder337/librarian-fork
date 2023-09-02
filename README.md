@@ -50,24 +50,24 @@ A webcam feed window will appear showing the camera's view. Slide books with ISB
 
 Press 'q' or 'esc' to quit the program and close the webcam feed window.
 
-##Configuration
+## Configuration
 
 The program contains a few configuration options:
 
-    The program assumes a USB webcam is used, oriented facing your desk for easy barcode scanning.
-    You can change the location of the SQLite database file by modifying the database connection paths in the code.
-    Captured barcode frames are saved in a 'captures' directory. You can change this directory's name or location by modifying the save_capture function.
+The program assumes a USB webcam is used, oriented facing your desk for easy barcode scanning.
+You can change the location of the SQLite database file by modifying the database connection paths in the code.
+Captured barcode frames are saved in a 'captures' directory. You can change this directory's name or location by modifying the save_capture function.
 
-##Additional Notes
+## Additional Notes
 
-    The BarcodeScanner class provides methods for creating the database table, checking for existing ISBNs, storing ISBNs, and more.
-    The is_valid_isbn method validates ISBNs using the isbnlib library, checking both ISBN-10 and ISBN-13 formats.
-    The capture_barcode method continuously captures frames, detects barcodes, and stores ISBNs until you exit the program.
+The BarcodeScanner class provides methods for creating the database table, checking for existing ISBNs, storing ISBNs, and more.
+The is_valid_isbn method validates ISBNs using the isbnlib library, checking both ISBN-10 and ISBN-13 formats.
+The capture_barcode method continuously captures frames, detects barcodes, and stores ISBNs until you exit the program.
 
-##Contribution
+## Contribution
 
 Contributions to this project are welcome! If you encounter any issues, have ideas for improvements, or want to add new features, feel free to submit a pull request or open an issue.
 
-##License
+## License
 
 This barcode scanner is open-source and licensed under the MIT License. See the LICENSE file for more details.
