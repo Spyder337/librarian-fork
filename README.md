@@ -71,3 +71,7 @@ Contributions to this project are welcome! If you encounter any issues, have ide
 ## License
 
 This barcode scanner is open-source and licensed under the MIT License. See the LICENSE file for more details.
+
+## Acknowlegdements
+
+The development of this application benefited from the assistance of language models, including GPT-3.5 and GPT-4, provided by OpenAI. The author acknowledges the valuable contributions made by these language models in generating design ideas and providing insights during the development process.
