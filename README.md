@@ -26,9 +26,9 @@ You can install these dependencies using the following command:
 pip install opencv-python pyzbar isbnlib
 ```
 
-Usage
+## Usage
 
-    Clone the repository to your local machine:
+Clone the repository to your local machine:
 
 ```bash
 git clone <repository-url>
