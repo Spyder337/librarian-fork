@@ -31,7 +31,7 @@ pip install opencv-python pyzbar isbnlib
 Clone the repository to your local machine:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/FaxanaduHacks/librarian.git
 ```
 
 Navigate to the repository directory:
