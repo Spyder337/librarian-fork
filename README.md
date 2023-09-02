@@ -37,7 +37,7 @@ git clone <repository-url>
 Navigate to the repository directory:
 
 ```bash
-cd barcode-scanner-program
+cd librarian
 ````
 
 Run the barcode_scanner.py script:
