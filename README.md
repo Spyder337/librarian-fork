@@ -72,8 +72,6 @@ Contributions to this project are welcome! If you encounter any issues, have ide
 
 This barcode scanner is open-source and licensed under the MIT License. See the LICENSE file for more details.
 
-## Acknowlegdements
-
 ## Acknowledgments
 
 This program utilizes the OpenCV library for computer vision tasks. Credits to the OpenCV community for their contributions.
