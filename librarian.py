@@ -6,7 +6,8 @@ import sqlite3
 import os
 import isbnlib
 import time
-from book_db import storeIsbn as db_store
+from book_meta import OpenLibraryProvider
+from book_db import store_book, storeIsbn
 from book_parser import validateAndConvert
 
 class BarcodeScanner:
@@ -41,8 +42,17 @@ class BarcodeScanner:
         :param frame: The image frame containing the barcode.
         :return: True if the ISBN was stored successfully, False otherwise.
         """
+        def_provider = OpenLibraryProvider
         framePath = f"captures/barcode_{isbn}.png"
-        db_store(isbn, framePath, None)
+        
+        #   Fetch metadata for the newly found isbn.
+        meta = def_provider.fetchBook(def_provider, isbn)
+        if(meta != None):
+            store_book(isbn, framePath, meta[0], meta[1], meta[2])
+            #print(meta)
+        else:
+            #   If none is found just store the path to the image with the isbn
+            storeIsbn(isbn, framePath)
         
         # Save the frame in the captures directory:
         self.save_capture(frame, isbn)
