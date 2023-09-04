@@ -13,7 +13,10 @@ def create_table() -> None:
     c.execute('''CREATE TABLE IF NOT EXISTS books
                     (id INTEGER PRIMARY KEY AUTOINCREMENT,
                     isbn TEXT NOT NULL,
-                    path TEXT NOT NULL);''')
+                    path TEXT NOT NULL,
+                    title TEXT,
+                    publishers TEXT,
+                    pubDate TEXT);''')
 
     # Commit the changes and close the connection
     conn.commit()
@@ -32,8 +35,45 @@ def isbn_exists(isbn: str) -> bool:
     conn.close()
 
     return result is not None
+
+def store_book(isbn: str, filePath: str, title: str = None, publishers: str = None, 
+               publishDate: str = None, log: Logger = None):
+    if(isbn_exists(isbn)):
+        return False
+    conn = sqlite3.connect(conn_string)
+    command = conn.cursor()
     
-def store_isbn(isbn: str, filePath: str, logger:Logger=None) -> bool:
+    command.execute(f"""INSERT 
+                    INTO books (isbn, path, title, publishers, pubDate) 
+                    VALUES ({isbn}, \"{filePath}\", \"{title}\", \"{publishers}\", \"{publishDate}\")""")
+    conn.commit()
+    conn.close()
+    return True
+
+def updateMetaData(isbn: str,
+                   title: str, publishers: str,
+                   publishDate: str, log: Logger = None):
+    if isbn_exists(isbn):
+        conn = sqlite3.connect(conn_string)
+        c = conn.cursor()
+        try:
+            c.execute(f"""UPDATE books SET 
+                      title=\"{title}\",
+                      publishers=\"{publishers}\",
+                      pubDate=\"{publishDate}\"
+                      WHERE isbn={isbn};
+                      """)
+            conn.commit()
+        except:
+            if(log != None):
+                log.exception(f"Failed to update book with isbn:{isbn}")
+            return False
+        conn.close()
+        return True
+    else:
+        return False
+
+def storeIsbn(isbn: str, filePath: str, logger:Logger=None) -> bool:
     # Check if the ISBN already exists in the database
     if isbn_exists(isbn):
         return False

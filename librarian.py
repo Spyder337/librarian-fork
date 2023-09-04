@@ -6,7 +6,7 @@ import sqlite3
 import os
 import isbnlib
 import time
-from book_db import store_isbn as db_store
+from book_db import storeIsbn as db_store
 from book_parser import validateAndConvert
 
 class BarcodeScanner:

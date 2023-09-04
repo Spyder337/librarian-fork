@@ -1,6 +1,7 @@
 import os
 from logging import Logger
-from book_db import store_isbn
+from book_db import storeIsbn, updateMetaData, store_book
+from book_meta import OpenLibraryProvider
 #   Libraries for finding and validating ISBNs
 import isbnlib
 import re
@@ -84,7 +85,8 @@ def parseDirectories(dirPath: [str], logger: Logger) -> [str]:
     pdfCount: int = 0
     parsedPdfCount: int = 0
     valid_isbns: [str] = []
-        
+    def_provider = OpenLibraryProvider
+    
     for dir in dirPath:
         files = os.listdir(dir)
         for file in files:
@@ -97,7 +99,12 @@ def parseDirectories(dirPath: [str], logger: Logger) -> [str]:
                     if (isbn != None):
                         valid_isbns.append(isbn)
                         parsedPdfCount += 1
-                        store_isbn(isbn, file, logger)
+                        meta = def_provider.fetchBook(def_provider, isbn)
+                        if(meta != None):
+                            store_book(isbn, file, meta[0], meta[1], meta[2], logger)
+                            #print(meta)
+                        else:
+                            storeIsbn(isbn, file, logger)
                     else:
                         logger.error(f"Failed to parse \"{file}\"")
                         
@@ -108,7 +115,12 @@ def parseDirectories(dirPath: [str], logger: Logger) -> [str]:
                     if (isbn != None):
                         valid_isbns.append(isbn)
                         parsedEpubCount += 1
-                        store_isbn(isbn, file, logger)
+                        meta = def_provider.fetchBook(def_provider, isbn)
+                        if(meta != None):
+                            store_book(isbn, file, meta[0], meta[1], meta[2], logger)
+                            #print(meta)
+                        else:
+                            storeIsbn(isbn, file, logger)
                     else:
                         logger.error(f"Failed to parse \"{file}\"")
             

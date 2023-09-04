@@ -4,6 +4,7 @@ import logging
 from pathlib import Path
 from book_parser import parseDirectories
 from book_db import create_table
+from book_meta import OpenLibraryProvider
 from librarian import BarcodeScanner
 
 #   Example of guards for output
@@ -56,7 +57,7 @@ def main():
         #   Get the root dir to search for books
         bookDir = getBooksDir()
         parseDirectories([x[0] for x in os.walk(bookDir)], log)
-    elif in_val == "3":
+    else:
         quit()
         
 if __name__ == "__main__":
