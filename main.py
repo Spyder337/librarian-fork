@@ -1,6 +1,7 @@
 import os
 import platform
 import logging
+from logging import Logger
 from pathlib import Path
 from book_parser import parseDirectories
 from book_db import create_table
@@ -30,7 +31,7 @@ def initFolders() -> None:
     if not os.path.exists('captures'):
         os.makedirs('captures')
         
-def initLogging() -> logging.Logger:
+def initLogging() -> Logger:
     logging.basicConfig(filename=parser_log_path, filemode='w', format="%(levelname)s:%(asctime)s - %(message)s")
     logger=logging.getLogger()
     return logger
@@ -41,24 +42,55 @@ def getBooksDir() -> str:
         inputdir = booksDir
     return inputdir
 
+def print_menu():
+    print("""[1] Scan barcode
+          [2] Scan barcodes
+          [3] Scan folder
+          [4] Scan Folders
+          [5] Exit (or any other key)""")
+
+def parse_selection(log: Logger):
+    sel = input()
+    if sel == "1":
+        scanner = BarcodeScanner
+        scanner.capture_single_barcode(scanner)
+    elif sel == "2":
+        scanner = BarcodeScanner
+        scanner.start_scanning(self=scanner)
+    elif sel == "3":
+        bookDir = getBooksDir()
+        parseDirectories([x[0] for x in os.walk(bookDir)], log)
+    elif sel == "4":
+        dirs = []
+        print("Enter in directories seperated by pressing the return key.")
+        print("Enter 'q' to quit.")
+        while True:
+            d = input("Directory Path: ")
+            if (os.path.exists(d) and os.path.isdir(d)):
+                dirs.append(d)
+            elif d == "q":
+                break                
+            else:
+                print("Invalid directory entered. Please try a valid one.")
+        all_dirs = []
+        for d in dirs:
+            sub_dirs = [x[0] for x in os.walk(d)]
+            for sd in sub_dirs:
+                all_dirs.append(sd)
+        parseDirectories(all_dirs, log)
+    else:
+        quit()
+
 def main():
     initFolders()
     #   Create the database for isbns and books
     create_table()
+    #   Initialize the log for all files
     log = initLogging()
-    print("[1] Scan barcodes")
-    print("[2] Scan folder")
-    print("[3] Exit")
-    in_val = input()
-    if in_val == "1":
-        scanner = BarcodeScanner
-        scanner.start_scanning(self=scanner)
-    elif in_val == "2":
-        #   Get the root dir to search for books
-        bookDir = getBooksDir()
-        parseDirectories([x[0] for x in os.walk(bookDir)], log)
-    else:
-        quit()
+    #   Print the selections
+    print_menu()
+    #   Get the user input
+    parse_selection(log)
         
 if __name__ == "__main__":
     main()

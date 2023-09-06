@@ -72,6 +72,46 @@ class BarcodeScanner:
         filename = f"captures/barcode_{isbn}.png"
         cv2.imwrite(filename, frame)
 
+    def capture_single_barcode(self):
+        """
+        Captures a single frame from the webcam, detects the barcode, and stores
+        the valid ISBN in the database along with metadata if available.
+        """
+        cap = cv2.VideoCapture(0)
+        
+        ret, frame = cap.read()
+        cv2.imshow('Barcode Scanner', frame)
+        
+        if not self.book_detected and not self.isbn_stored:
+            barcodes = pyzbar.decode(frame)
+            
+            for barcode in barcodes:
+                barcode_data = barcode.data.decode('utf-8')
+                if validateAndConvert(barcode_data) != None:
+                    self.store_isbn(barcode_data, frame)
+                    self.barcode_detected = True
+                    self.last_valid_isbn = barcode_data
+                    
+            if self.barcode_detected == True:
+                self.book_detected = True
+                self.isbn_stored = True
+            else:
+                self.book_detected = False
+                self.isbn_stored = False
+                
+            if self.barcode_detected:
+                print("Valid ISBN barcode detected.")
+                print("Last valid ISBN: ", self.last_valid_isbn)
+            else:
+                print("No valid ISBN barcode detected.")
+
+            # Reset the barcode detection flag:
+            self.barcode_detected = False
+            
+            time.sleep(1)
+            cap.release()
+            cv2.destroyAllWindows()
+
     def capture_barcode(self):
         """
         Captures frames from the webcam, detects barcodes, and stores valid
