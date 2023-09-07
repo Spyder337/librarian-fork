@@ -5,6 +5,9 @@ from logging import Logger
 conn_string: str = "data/isbn_database.db"
 
 def create_table() -> None:
+    """
+        Creates a sqlite3 database if none exists.
+    """
     # Connect to the SQLite database
     conn = sqlite3.connect(conn_string)
     c = conn.cursor()
@@ -23,6 +26,14 @@ def create_table() -> None:
     conn.close()
         
 def isbn_exists(isbn: str) -> bool:
+    """Checks if an ISBN string exists in the database.
+
+    Args:
+        isbn (str): ISBN string to search for in DB.
+
+    Returns:
+        bool: Whether or not the ISBN exists.
+    """
     # Connect to the SQLite database
     conn = sqlite3.connect(conn_string)
     c = conn.cursor()
@@ -38,6 +49,10 @@ def isbn_exists(isbn: str) -> bool:
 
 def store_book(isbn: str, filePath: str, title: str = None, publishers: str = None, 
                publishDate: str = None, log: Logger = None):
+    """
+        Store a book and its metadata (optional).
+    """
+
     if(isbn_exists(isbn)):
         return False
     conn = sqlite3.connect(conn_string)
@@ -53,6 +68,11 @@ def store_book(isbn: str, filePath: str, title: str = None, publishers: str = No
 def update_meta_data(isbn: str,
                    title: str, publishers: str,
                    publishDate: str, log: Logger = None):
+    
+    """
+        Update a books metadata.
+    """
+    
     if isbn_exists(isbn):
         conn = sqlite3.connect(conn_string)
         c = conn.cursor()
@@ -74,6 +94,17 @@ def update_meta_data(isbn: str,
         return False
 
 def store_isbn(isbn: str, filePath: str, logger:Logger=None) -> bool:
+    """
+    
+
+    Args:
+        isbn (str): ISBN string for the book.
+        filePath (str): Location of the eBook or barcode image.
+        logger (Logger, optional): Log to write errors and exceptions to. Defaults to None.
+
+    Returns:
+        bool: Whether or not the book was stored sucessfully.
+    """
     # Check if the ISBN already exists in the database
     if isbn_exists(isbn):
         return False

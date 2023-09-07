@@ -20,22 +20,38 @@ from bs4 import BeautifulSoup
 #   Variables
 isbnPattern = r"(\b978(?:-?\d){10}\b)|(\b978(?:-?\d){9}(?:-?X|x))|(\b(?:-?\d){10})\b|(\b(?:-?\d){9}(?:-?X|x)\b)"
 
-"""
-    Sanitizes then validates an isbn using isbnlib. If its isbn10 it is then converted
-    to isbn13 and returned.
-"""
+
 def validate_and_convert(isbn: str) -> str | None:
-        isbn = isbn.replace("-", "").replace(" ", "")
-        if (isbnlib.is_isbn10(isbn) | isbnlib.is_isbn13(isbn)):
-            if(isbnlib.is_isbn10):
-                isbn = isbnlib.to_isbn13(isbn)
-            return isbn
-        else:
-            return None
+    """
+        Sanitizes then validates an isbn using isbnlib. If its isbn10 it is then converted
+        to isbn13 and returned.
+        
+        Args:
+            isbn (str): Isbn to be validated as a string.
+            
+        Returns:
+            str | None: The valid isbn as an ISBN-13 or None if invalid.
+    """
+    isbn = isbn.replace("-", "").replace(" ", "")
+    if (isbnlib.is_isbn10(isbn) | isbnlib.is_isbn13(isbn)):
+        if(isbnlib.is_isbn10):
+            isbn = isbnlib.to_isbn13(isbn)
+        return isbn
+    else:
+        return None
 
 #   Uses regex to find an isbn in text
 #   Returns the first result or None
 def find_isbn_in_text(text: str) -> str | None:
+    """
+        Uses Regex to parse text for a valid isbn string.
+
+    Args:
+        text (str): Text string to be parsed for a valid isbn.
+
+    Returns:
+        str | None: Either a valid isbn or None.
+    """
     isbn = None
     match = re.search(isbnPattern, text)
     if (match != None):
@@ -43,11 +59,18 @@ def find_isbn_in_text(text: str) -> str | None:
         isbn = validate_and_convert(isbn)
     return isbn
 
-"""
-    Uses pytesseract to scan the first numPages of a pdf. If no isbn is found
-    then none is returned.
-"""
+
 def parse_isbn_from_pdf(fileName: str, numPages: int = 10) -> str | None:
+    """
+        Scans a pdf using OCR and regex for an ISBN.
+
+    Args:
+        fileName (str): Full filepath to the pdf.
+        numPages (int, optional): Number of pages to scan by default. Defaults to 10.
+
+    Returns:
+        str | None: Either a valid ISBN or None.
+    """
     isbn = None
     pdf_pages = convert_from_path(fileName, 200, last_page=numPages, thread_count=2)
     for i in range(numPages):
@@ -58,10 +81,16 @@ def parse_isbn_from_pdf(fileName: str, numPages: int = 10) -> str | None:
             break
     return isbn
 
-"""
-    Reads an epub and regexes for potential isbn numbers and returns a valid one.
-"""
+
 def parse_isbn_from_epub(fileName: str) -> str | None:
+    """
+        Scans an epub using OCR and regex for an ISBN.
+    Args:
+        fileName (str): Full filepath to the file to be read.
+
+    Returns:
+        str | None: Either a valid isbn13 string or None.
+    """
     isbn = None
     book = epub.read_epub(fileName, {"ignore_ncx": True})
     items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
@@ -77,8 +106,17 @@ def parse_isbn_from_epub(fileName: str) -> str | None:
                 return isbn
     return isbn
 
-#   Scans books in supplied directories
 def parse_directories(dirPath: [str], logger: Logger) -> [str]:
+    """
+        Scan directories for valid eBooks and their ISBNs.
+
+    Args:
+        dirPath (str]): Directories to scan for eBooks.
+        logger (Logger): Log that is written to.
+
+    Returns:
+        [str]: List of valid ISBNs found in the directories.
+    """
     fileCount: int = 0
     epubCount: int = 0
     parsedEpubCount: int = 0

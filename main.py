@@ -47,7 +47,7 @@ def print_menu():
           [2] Scan barcodes
           [3] Scan folder
           [4] Scan Folders
-          [5] Exit (or any other key)""")
+          [5] Any other key""")
 
 def parse_selection(log: Logger):
     sel = input()
