@@ -3,7 +3,7 @@ import platform
 import logging
 from logging import Logger
 from pathlib import Path
-from book_parser import parseDirectories
+from book_parser import parse_directories
 from book_db import create_table
 from book_meta import OpenLibraryProvider
 from librarian import BarcodeScanner
@@ -21,7 +21,7 @@ booksDir = root_dir / Path("Books")
 #   Path to store the log file
 parser_log_path: str = "logs/parser.log"
 
-def initFolders() -> None:
+def init_folders() -> None:
     #   Create the logs and data directory if none exists
     if(not os.path.exists("logs")):
         os.makedirs("logs")
@@ -31,12 +31,12 @@ def initFolders() -> None:
     if not os.path.exists('captures'):
         os.makedirs('captures')
         
-def initLogging() -> Logger:
+def init_logs() -> Logger:
     logging.basicConfig(filename=parser_log_path, filemode='w', format="%(levelname)s:%(asctime)s - %(message)s")
     logger=logging.getLogger()
     return logger
 
-def getBooksDir() -> str:
+def get_books_dir() -> str:
     inputdir = input("Input a path to parse or leave blank for default:")
     if(inputdir == ""):
         inputdir = booksDir
@@ -58,8 +58,8 @@ def parse_selection(log: Logger):
         scanner = BarcodeScanner
         scanner.start_scanning(self=scanner)
     elif sel == "3":
-        bookDir = getBooksDir()
-        parseDirectories([x[0] for x in os.walk(bookDir)], log)
+        bookDir = get_books_dir()
+        parse_directories([x[0] for x in os.walk(bookDir)], log)
     elif sel == "4":
         dirs = []
         print("Enter in directories seperated by pressing the return key.")
@@ -77,20 +77,21 @@ def parse_selection(log: Logger):
             sub_dirs = [x[0] for x in os.walk(d)]
             for sd in sub_dirs:
                 all_dirs.append(sd)
-        parseDirectories(all_dirs, log)
+        parse_directories(all_dirs, log)
     else:
         quit()
 
 def main():
-    initFolders()
+    init_folders()
     #   Create the database for isbns and books
     create_table()
     #   Initialize the log for all files
-    log = initLogging()
-    #   Print the selections
-    print_menu()
-    #   Get the user input
-    parse_selection(log)
+    log = init_logs()
+    while True:
+        #   Print the selections
+        print_menu()
+        #   Get the user input
+        parse_selection(log)
         
 if __name__ == "__main__":
     main()

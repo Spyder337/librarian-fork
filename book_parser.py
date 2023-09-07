@@ -1,6 +1,6 @@
 import os
 from logging import Logger
-from book_db import storeIsbn, updateMetaData, store_book
+from book_db import store_isbn, update_meta_data, store_book
 from book_meta import OpenLibraryProvider
 #   Libraries for finding and validating ISBNs
 import isbnlib
@@ -24,7 +24,7 @@ isbnPattern = r"(\b978(?:-?\d){10}\b)|(\b978(?:-?\d){9}(?:-?X|x))|(\b(?:-?\d){10
     Sanitizes then validates an isbn using isbnlib. If its isbn10 it is then converted
     to isbn13 and returned.
 """
-def validateAndConvert(isbn: str) -> str | None:
+def validate_and_convert(isbn: str) -> str | None:
         isbn = isbn.replace("-", "").replace(" ", "")
         if (isbnlib.is_isbn10(isbn) | isbnlib.is_isbn13(isbn)):
             if(isbnlib.is_isbn10):
@@ -35,25 +35,25 @@ def validateAndConvert(isbn: str) -> str | None:
 
 #   Uses regex to find an isbn in text
 #   Returns the first result or None
-def findIsbnInText(text: str) -> str | None:
+def find_isbn_in_text(text: str) -> str | None:
     isbn = None
     match = re.search(isbnPattern, text)
     if (match != None):
         isbn = match.group()
-        isbn = validateAndConvert(isbn)
+        isbn = validate_and_convert(isbn)
     return isbn
 
 """
     Uses pytesseract to scan the first numPages of a pdf. If no isbn is found
     then none is returned.
 """
-def parseIsbnFromPdf(fileName: str, numPages: int = 10) -> str | None:
+def parse_isbn_from_pdf(fileName: str, numPages: int = 10) -> str | None:
     isbn = None
     pdf_pages = convert_from_path(fileName, 200, last_page=numPages, thread_count=2)
     for i in range(numPages):
         page: Image = pdf_pages[i]
         text: str = pytesseract.image_to_string(page)
-        isbn = findIsbnInText(text)
+        isbn = find_isbn_in_text(text)
         if (isbn != None):
             break
     return isbn
@@ -61,7 +61,7 @@ def parseIsbnFromPdf(fileName: str, numPages: int = 10) -> str | None:
 """
     Reads an epub and regexes for potential isbn numbers and returns a valid one.
 """
-def parseIsbnFromEpub(fileName: str) -> str | None:
+def parse_isbn_from_epub(fileName: str) -> str | None:
     isbn = None
     book = epub.read_epub(fileName, {"ignore_ncx": True})
     items = list(book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
@@ -72,13 +72,13 @@ def parseIsbnFromEpub(fileName: str) -> str | None:
         text = [para.get_text() for para in soup.find_all('p')]
         #   Join them into a single string
         for para in text:
-            isbn = findIsbnInText(para)
+            isbn = find_isbn_in_text(para)
             if isbn != None:
                 return isbn
     return isbn
 
 #   Scans books in supplied directories
-def parseDirectories(dirPath: [str], logger: Logger) -> [str]:
+def parse_directories(dirPath: [str], logger: Logger) -> [str]:
     fileCount: int = 0
     epubCount: int = 0
     parsedEpubCount: int = 0
@@ -95,32 +95,32 @@ def parseDirectories(dirPath: [str], logger: Logger) -> [str]:
                 if file.endswith(".pdf"):
                     pdfCount += 1
                     fileCount += 1
-                    isbn = parseIsbnFromPdf(filePath)
+                    isbn = parse_isbn_from_pdf(filePath)
                     if (isbn != None):
                         valid_isbns.append(isbn)
                         parsedPdfCount += 1
-                        meta = def_provider.fetchBook(def_provider, isbn)
+                        meta = def_provider.fetch_book(def_provider, isbn)
                         if(meta != None):
                             store_book(isbn, file, meta[0], meta[1], meta[2], logger)
                             #print(meta)
                         else:
-                            storeIsbn(isbn, file, logger)
+                            store_isbn(isbn, file, logger)
                     else:
                         logger.error(f"Failed to parse \"{file}\"")
                         
                 elif file.endswith(".epub"):
                     epubCount += 1
                     fileCount += 1
-                    isbn = parseIsbnFromEpub(filePath)
+                    isbn = parse_isbn_from_epub(filePath)
                     if (isbn != None):
                         valid_isbns.append(isbn)
                         parsedEpubCount += 1
-                        meta = def_provider.fetchBook(def_provider, isbn)
+                        meta = def_provider.fetch_book(def_provider, isbn)
                         if(meta != None):
                             store_book(isbn, file, meta[0], meta[1], meta[2], logger)
                             #print(meta)
                         else:
-                            storeIsbn(isbn, file, logger)
+                            store_isbn(isbn, file, logger)
                     else:
                         logger.error(f"Failed to parse \"{file}\"")
             

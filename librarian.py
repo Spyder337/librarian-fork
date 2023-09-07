@@ -6,9 +6,9 @@ import sqlite3
 import os
 import isbnlib
 import time
+import book_db
 from book_meta import OpenLibraryProvider
-from book_db import store_book, storeIsbn
-from book_parser import validateAndConvert
+from book_parser import validate_and_convert
 
 class BarcodeScanner:
     book_detected: bool = False
@@ -46,13 +46,13 @@ class BarcodeScanner:
         framePath = f"captures/barcode_{isbn}.png"
         
         #   Fetch metadata for the newly found isbn.
-        meta = def_provider.fetchBook(def_provider, isbn)
+        meta = def_provider.fetch_book(def_provider, isbn)
         if(meta != None):
-            store_book(isbn, framePath, meta[0], meta[1], meta[2])
+            book_db.store_book(isbn, framePath, meta[0], meta[1], meta[2])
             #print(meta)
         else:
             #   If none is found just store the path to the image with the isbn
-            storeIsbn(isbn, framePath)
+            book_db.store_isbn(isbn, framePath)
         
         # Save the frame in the captures directory:
         self.save_capture(frame, isbn)
@@ -87,7 +87,7 @@ class BarcodeScanner:
             
             for barcode in barcodes:
                 barcode_data = barcode.data.decode('utf-8')
-                if validateAndConvert(barcode_data) != None:
+                if validate_and_convert(barcode_data) != None:
                     self.store_isbn(barcode_data, frame)
                     self.barcode_detected = True
                     self.last_valid_isbn = barcode_data
@@ -138,7 +138,7 @@ class BarcodeScanner:
                 # If a barcode is detected, filter and store the ISBN:
                 for barcode in barcodes:
                     barcode_data = barcode.data.decode('utf-8')
-                    if validateAndConvert(barcode_data) != None:
+                    if validate_and_convert(barcode_data) != None:
                         self.store_isbn(barcode_data, frame)
                         self.barcode_detected = True
                         self.last_valid_isbn = barcode_data

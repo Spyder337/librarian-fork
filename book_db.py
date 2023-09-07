@@ -50,7 +50,7 @@ def store_book(isbn: str, filePath: str, title: str = None, publishers: str = No
     conn.close()
     return True
 
-def updateMetaData(isbn: str,
+def update_meta_data(isbn: str,
                    title: str, publishers: str,
                    publishDate: str, log: Logger = None):
     if isbn_exists(isbn):
@@ -73,7 +73,7 @@ def updateMetaData(isbn: str,
     else:
         return False
 
-def storeIsbn(isbn: str, filePath: str, logger:Logger=None) -> bool:
+def store_isbn(isbn: str, filePath: str, logger:Logger=None) -> bool:
     # Check if the ISBN already exists in the database
     if isbn_exists(isbn):
         return False
