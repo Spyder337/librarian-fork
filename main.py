@@ -4,7 +4,7 @@ import logging
 from logging import Logger
 from pathlib import Path
 from book_parser import parse_directories
-from book_db import create_table
+from book_db import create_table, get_all_books
 from book_meta import OpenLibraryProvider
 from librarian import BarcodeScanner
 
@@ -30,7 +30,13 @@ def init_folders() -> None:
     # Create the captures directory if it doesn't exist:
     if not os.path.exists('captures'):
         os.makedirs('captures')
-        
+
+def clear():
+    if os.name == "nt":
+        _ = os.system("cls")
+    else:
+        _ = os.system("clear")
+
 def init_logs() -> Logger:
     logging.basicConfig(filename=parser_log_path, filemode='w', format="%(levelname)s:%(asctime)s - %(message)s")
     logger=logging.getLogger()
@@ -44,10 +50,11 @@ def get_books_dir() -> str:
 
 def print_menu():
     print("""[1] Scan barcode
-          [2] Scan barcodes
-          [3] Scan folder
-          [4] Scan Folders
-          [5] Any other key""")
+[2] Scan barcodes
+[3] Scan folder
+[4] Scan Folders
+[5] Output Library Contents
+[Any] Any other key""")
 
 def parse_selection(log: Logger):
     sel = input()
@@ -73,11 +80,19 @@ def parse_selection(log: Logger):
             else:
                 print("Invalid directory entered. Please try a valid one.")
         all_dirs = []
+        if dirs.__len__() == 0:
+            dirs.append(booksDir)
+        print(dirs.__len__())
+        print(dirs)
         for d in dirs:
             sub_dirs = [x[0] for x in os.walk(d)]
             for sd in sub_dirs:
                 all_dirs.append(sd)
         parse_directories(all_dirs, log)
+    elif sel == "5":
+        # Comment
+        clear()
+        get_all_books()
     else:
         quit()
 
@@ -92,6 +107,7 @@ def main():
         print_menu()
         #   Get the user input
         parse_selection(log)
+    #get_book("9781801077361")
         
 if __name__ == "__main__":
     main()

@@ -65,6 +65,56 @@ def store_book(isbn: str, filePath: str, title: str = None, publishers: str = No
     conn.close()
     return True
 
+def get_book(isbn: str, log: Logger = None) -> [str]:
+    """
+        Generates a list of book attributes if a book exists.
+    Args:
+        isbn (str): ISBN-13 of the book.
+
+    Returns:
+        [str]: List of ISBN, associated file name, title, publishers, and
+        publishing date in that order.
+    """
+    if not isbn_exists(isbn):
+        return None
+    
+    conn = sqlite3.connect(conn_string)
+    c = conn.cursor()
+    vals: [str] = []
+    try:
+        c.execute(f"""SELECT * FROM books WHERE isbn={isbn}""")
+        res = c.fetchone()
+        vals = [res[1], res[2], res[3], res[4], res[5]]
+    except:
+        if not log == None:
+            log.exception(f"Book not found in db: {isbn}")
+            
+    conn.close()
+    return vals
+    
+def get_all_books(log: Logger = None) -> [[str]]:
+    conn = sqlite3.connect(conn_string)
+    c = conn.cursor()
+    
+    try:
+        c.execute(f"""SELECT * FROM books""")
+        res = c.fetchall()
+        books = []
+        for b in res:
+            books.append([b[1], b[2], b[3], b[4], b[5]])
+            
+        print(f"{'ISBN':14s}{'Title':100s}")
+        for book in books:
+            print(f"{book[0]:14s}{book[2]:100s}")
+        #print(books)
+        print()
+    except:
+        if not log == None:
+            log.exception("Failed to request books from database.")
+            
+    conn.close()
+    return books
+    
 def update_meta_data(isbn: str,
                    title: str, publishers: str,
                    publishDate: str, log: Logger = None):
