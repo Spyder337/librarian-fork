@@ -43,7 +43,7 @@ def init_logs() -> Logger:
     return logger
 
 def get_books_dir() -> str:
-    inputdir = input("Input a path to parse or leave blank for default:")
+    inputdir = input(f"Input a path to parse or leave blank for default.\nDefault: {booksDir}\n")
     if(inputdir == ""):
         inputdir = booksDir
     return inputdir
@@ -58,41 +58,54 @@ def print_menu():
 
 def parse_selection(log: Logger):
     sel = input()
+    clear()
     if sel == "1":
         scanner = BarcodeScanner
         scanner.capture_single_barcode(scanner)
+        
     elif sel == "2":
         scanner = BarcodeScanner
         scanner.start_scanning(self=scanner)
+        
     elif sel == "3":
         bookDir = get_books_dir()
         parse_directories([x[0] for x in os.walk(bookDir)], log)
+        print()
+        
     elif sel == "4":
         dirs = []
-        print("Enter in directories seperated by pressing the return key.")
+        
+        print(f"Enter in directories seperated by pressing the return key or leave blank to use the default.")
+        print(f"Default: {booksDir}")
         print("Enter 'q' to quit.")
+        
         while True:
             d = input("Directory Path: ")
             if (os.path.exists(d) and os.path.isdir(d)):
                 dirs.append(d)
             elif d == "q":
-                break                
+                return        
+            elif d == "":
+                break        
             else:
                 print("Invalid directory entered. Please try a valid one.")
+                
         all_dirs = []
         if dirs.__len__() == 0:
             dirs.append(booksDir)
-        print(dirs.__len__())
-        print(dirs)
+            
         for d in dirs:
             sub_dirs = [x[0] for x in os.walk(d)]
             for sd in sub_dirs:
                 all_dirs.append(sd)
+                
         parse_directories(all_dirs, log)
+        print()
+        
     elif sel == "5":
         # Comment
-        clear()
         get_all_books()
+        
     else:
         quit()
 
@@ -102,6 +115,7 @@ def main():
     create_table()
     #   Initialize the log for all files
     log = init_logs()
+    
     while True:
         #   Print the selections
         print_menu()

@@ -106,7 +106,7 @@ def get_all_books(log: Logger = None) -> [[str]]:
         print(f"{'ISBN':14s}{'Title':100s}")
         for book in books:
             print(f"{book[0]:14s}{book[2]:100s}")
-        #print(books)
+            
         print()
     except:
         if not log == None:
