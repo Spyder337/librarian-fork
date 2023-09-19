@@ -2,6 +2,8 @@
 import sqlite3
 from logging import Logger
 
+from book import Book
+
 conn_string: str = "data/isbn_database.db"
 
 def create_table() -> None:
@@ -65,7 +67,20 @@ def store_book(isbn: str, filePath: str, title: str = None, publishers: str = No
     conn.close()
     return True
 
-def get_book(isbn: str, log: Logger = None) -> [str]:
+def store_book(book: Book, log: Logger = None):
+    if(isbn_exists(book.isbn)):
+        return False
+    conn = sqlite3.connect(conn_string)
+    command = conn.cursor()
+    
+    command.execute(f"""INSERT 
+                    INTO books (isbn, path, title, publishers, pubDate) 
+                    VALUES ({book.isbn}, \"{book.path}\", \"{book.title}\", \"{book.publishers}\", \"{book.publish_date}\")""")
+    conn.commit()
+    conn.close()
+    return True
+
+def get_book(isbn: str, log: Logger = None) -> Book:
     """
         Generates a list of book attributes if a book exists.
     Args:
@@ -77,35 +92,35 @@ def get_book(isbn: str, log: Logger = None) -> [str]:
     """
     if not isbn_exists(isbn):
         return None
-    
+    book: Book = None
     conn = sqlite3.connect(conn_string)
     c = conn.cursor()
-    vals: [str] = []
     try:
         c.execute(f"""SELECT * FROM books WHERE isbn={isbn}""")
         res = c.fetchone()
-        vals = [res[1], res[2], res[3], res[4], res[5]]
+        book = Book(res[3], res[1], res[4], res[5], res[2])
     except:
         if not log == None:
             log.exception(f"Book not found in db: {isbn}")
             
     conn.close()
-    return vals
+    return book
     
-def get_all_books(log: Logger = None) -> [[str]]:
+def get_all_books(log: Logger = None) -> [Book]:
     conn = sqlite3.connect(conn_string)
     c = conn.cursor()
     
     try:
         c.execute(f"""SELECT * FROM books""")
         res = c.fetchall()
-        books = []
+        books: [Book] = []
         for b in res:
-            books.append([b[1], b[2], b[3], b[4], b[5]])
+            book = Book(b[3], b[1], b[4], b[5], b[2])
+            books.append(book)
             
         print(f"{'ISBN':14s}{'Title':100s}")
         for book in books:
-            print(f"{book[0]:14s}{book[2]:100s}")
+            print(f"{book.isbn:14s}{book.title:100s}")
             
         print()
     except:

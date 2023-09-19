@@ -1,11 +1,12 @@
 from collections import OrderedDict
 import json
 import requests
+from book import Book
 
 class OpenLibraryProvider:
     baseUrl: str = "https://openlibrary.org"
     
-    def fetch_book(self, isbn: str):
+    def fetch_book(self, isbn: str) -> Book:
         """
             Fetches a book from OpenLibrary's api.
         Args:
@@ -23,7 +24,8 @@ class OpenLibraryProvider:
                 #print(key, ":", data[key])
                 root = key
             pubData = self.merge_pub_data(data[root]["publishers"])
-            return [data[root]["title"], pubData, data[root]["publish_date"]]
+            b = Book(data[root]["title"], isbn, pubData, data[root]["publish_date"])
+            return b
         return None
     
     def merge_pub_data(data) -> str:

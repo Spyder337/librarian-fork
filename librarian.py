@@ -48,7 +48,8 @@ class BarcodeScanner:
         #   Fetch metadata for the newly found isbn.
         meta = def_provider.fetch_book(def_provider, isbn)
         if(meta != None):
-            book_db.store_book(isbn, framePath, meta[0], meta[1], meta[2])
+            meta.path = framePath
+            book_db.store_book(meta)
             #print(meta)
         else:
             #   If none is found just store the path to the image with the isbn

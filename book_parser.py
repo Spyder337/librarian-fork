@@ -139,7 +139,8 @@ def parse_directories(dirPath: [str], logger: Logger) -> [str]:
                         parsedPdfCount += 1
                         meta = def_provider.fetch_book(def_provider, isbn)
                         if(meta != None):
-                            store_book(isbn, filePath, meta[0], meta[1], meta[2], logger)
+                            meta.path = filePath
+                            store_book(meta, logger)
                             #print(meta)
                         else:
                             store_isbn(isbn, filePath, logger)
@@ -155,7 +156,8 @@ def parse_directories(dirPath: [str], logger: Logger) -> [str]:
                         parsedEpubCount += 1
                         meta = def_provider.fetch_book(def_provider, isbn)
                         if(meta != None):
-                            store_book(isbn, filePath, meta[0], meta[1], meta[2], logger)
+                            meta.path = filePath
+                            store_book(meta, logger)
                             #print(meta)
                         else:
                             store_isbn(isbn, filePath, logger)
